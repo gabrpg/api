@@ -21,8 +21,6 @@ const PORT = process.env.PORT || 3000;
 
 mongoose.set('strictQuery', false);
 mongoose.connect(process.env.DB_CONNECT).then(()=> console.log('Connected to DB'),  { useNewUrlParser: true, useUnifiedTopology: true });
-// EN LIGNE
-//mongoose.connect(process.env.DB_CONNECT).then(()=> console.log('Connected to DB'),  { useNewUrlParser: true, useUnifiedTopology: true });
 
 app.use('/menu', require("./routes/menuRoutes"));
 app.use('/stores', require('./routes/storesRoutes'));
