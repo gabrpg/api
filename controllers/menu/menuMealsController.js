@@ -13,7 +13,7 @@ async function getMealsByCategory(req, res) {
     try {
         let meals = await MenuMeals.find().populate('menuMealAllergens menuMealCategories');
         const map = new Map();
-        for (let i = 0; i < meals.count; i++) {
+        for (let i = 0; i < meals.length; i++) {
             for (let j = 0; j < meals[i].menuMealCategories.length; j++) {
                 const key = meals[i].menuMealCategories[j].menuCategoryName;
                 const collection = map.get(key);
