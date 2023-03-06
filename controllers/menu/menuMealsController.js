@@ -1,5 +1,6 @@
 const MenuMeals = require('../../models/menu/menuMealModel');
 const MenuCategory = require("../../models/menu/menuCategoryModel");
+const Users = require("../../models/usersModel");
 async function getAllMeals(req, res) {
     try {
         return res.status(200).json(await MenuMeals.find().populate('menuMealAllergens menuMealCategories'));
@@ -95,4 +96,26 @@ async function deleteMeal(req, res) {
         return res.status(400).json({error: "error when deleting item"});
     }
 }
-module.exports = { getAllMeals, getMealsByCategory, deleteAllMeals, getMeal, createMeal, modifyMeal, deleteMeal };
+
+async function rateMeal(req, res){
+    await MenuMeals.findOne({_id: req.query._id}).then(async (err, data)=> {
+        if(err) {
+            return res.sendStatus(400);
+        }
+        let rating = req.query.mealRating;
+        data.menuMealTotalRating += 1;
+        data.menuMealRating += rating;
+
+        await data.save().then(() => {
+            return res.sendStatus(201);
+        }).catch(err => {
+            console.log(err);
+            return res.sendStatus(401);
+        });
+    }).catch(err => {
+        console.log(err);
+        return res.sendStatus(500);
+    })
+}
+
+module.exports = { getAllMeals, getMealsByCategory, deleteAllMeals, getMeal, createMeal, modifyMeal, deleteMeal, rateMeal};
