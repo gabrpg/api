@@ -84,11 +84,18 @@ function generateToken() {
 function sendVerificationLink(message) {
 
     const transporter = nodemailer.createTransport({
-        service: 'gmail',
+        host:'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        requireTLS: true,
         auth: {
             user: process.env.AUTH_USERNAME,
             pass: process.env.AUTH_PASSWORD
-        }
+        },
+        tls: {
+            minVersion: 'TLSv1',
+            rejectUnauthorized: false,
+        },
     });
 
     transporter.sendMail(message, function(err, info){
@@ -103,7 +110,7 @@ function sendVerificationLink(message) {
 async function verifyEmailToken(req, res) {
     const token = req.params.token;
 
-    await Users.findOneAndUpdate({userEmailToken: token}, {userEmailVerified: true, userEmailToken: null}).then(async(data,err) => {
+    await Users.findOneAndUpdate({userEmailToken: token}, {userEmailVerified: true, userEmailToken: null}).then(async(err, data) => {
         if(err) {
             console.log(err);
             return res.sendStatus(400);
@@ -126,7 +133,7 @@ async function verifyPasswordToken(req, res) {
     await clearCookies(req, res);
     const token = req.params.token;
 
-    await Users.findOne({userPasswordToken: token}).then((data,err) => {
+    await Users.findOne({userPasswordToken: token}).then((err, data) => {
         if(err) {
             console.log(err);
             return res.sendStatus(400);
@@ -144,7 +151,7 @@ async function verifyPasswordToken(req, res) {
 }
 
 async function modifyPasswordAfterVerification(req,res){
-    await Users.findOne({userPasswordToken: req.body.userPasswordToken}).then( async (data,err) => {
+    await Users.findOne({userPasswordToken: req.body.userPasswordToken}).then( async (err, data) => {
         if(err){
             console.log(err);
             return res.sendStatus(400);
@@ -169,7 +176,7 @@ async function modifyPasswordAfterVerification(req,res){
 async function newVerficationToken(req, res) {
     const token = generateToken();
 
-    await Users.findOne({_id: new ObjectId(req.cookies['SESSION_INFO'].id)}).then(async (data,err) => {
+    await Users.findOne({_id: new ObjectId(req.cookies['SESSION_INFO'].id)}).then(async (err, data) => {
         if(err){
             console.log(err);
             return res.sendStatus(400);
@@ -202,7 +209,7 @@ async function newVerficationToken(req, res) {
 async function newPassword(req, res){
     const token = generateToken();
 
-    await Users.findOne({userEmail: req.body.userEmail}).then(async (data,err)=> {
+    await Users.findOne({userEmail: req.body.userEmail}).then(async (err, data)=> {
         if(err) {
             console.log(err);
             return res.sendStatus(400);
@@ -234,7 +241,7 @@ async function newPassword(req, res){
 }
 
 async function register(req, res) {
-    await Users.findOne({userEmail: req.body.userEmail}).then(async (data,err) => {
+    await Users.findOne({userEmail: req.body.userEmail}).then(async (err, data) => {
         if(err){
             console.log(err);
             return res.sendStatus(400);
@@ -272,7 +279,7 @@ async function register(req, res) {
 }
 
 async function login(req, res){
-    await Users.findOne({userEmail: req.body.userEmail}).then(async(data,err)=> {
+    await Users.findOne({userEmail: req.body.userEmail}).then(async(err, data)=> {
         if(err){
             console.log(err);
             return res.sendStatus(400);
