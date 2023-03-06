@@ -1,6 +1,4 @@
 const RatingMeal = require('../models/ratingModel');
-const Users = require("../models/usersModel");
-const bcrypt = require("bcrypt");
 
 
 async function rateMeal(req, res){
