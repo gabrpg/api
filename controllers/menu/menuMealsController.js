@@ -24,7 +24,7 @@ async function getMealsByCategory(req, res) {
                 }
             }
         }
-        return res.status(200).json(JSON.stringify(Object.fromEntries(map)));
+        return res.status(200).json(Object.fromEntries(map));
     } catch (e) {
         console.log(e);
         return res.status(400).json({error: "error when getting item"});
