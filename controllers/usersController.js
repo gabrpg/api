@@ -279,7 +279,7 @@ async function register(req, res) {
 }
 
 async function login(req, res){
-    await Users.findOne({userEmail: req.body.userEmail}).then(async(err, data)=> {
+    await Users.findOne({userEmail: req.body.userEmail}).then(async(data,err)=> {
         if(err){
             console.log(err);
             return res.sendStatus(400);
