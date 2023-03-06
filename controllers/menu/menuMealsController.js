@@ -10,7 +10,7 @@ async function getAllMeals(req, res) {
     }
 }
 async function getMealsByCategory(req, res) {
-    try {
+    try { 
         let meals = await MenuMeals.find().populate('menuMealAllergens menuMealCategories');
         const map = new Map();
         for (let i = 0; i < meals.length; i++) {
