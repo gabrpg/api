@@ -21,5 +21,4 @@ router.route('/allergens/:_id')
     .put(isJwtValid, isAdmin,menuAllergensController.modifyAllergen)
     .delete(isJwtValid, isAdmin,menuAllergensController.deleteAllergen);
 router.route('/mealsbycategory').get(menuMealsController.getMealsByCategory);
-router.route('/rating').get(menuMealsController.rateMeal);
 module.exports = router;

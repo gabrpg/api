@@ -97,25 +97,4 @@ async function deleteMeal(req, res) {
     }
 }
 
-async function rateMeal(req, res){
-    await MenuMeals.findOne({_id: req.query._id}).then(async (err, data)=> {
-        if(err) {
-            return res.sendStatus(400);
-        }
-        let rating = req.query.mealRating;
-        data.menuMealTotalRating += 1;
-        data.menuMealRating += rating;
-
-        await data.save().then(() => {
-            return res.sendStatus(201);
-        }).catch(err => {
-            console.log(err);
-            return res.sendStatus(401);
-        });
-    }).catch(err => {
-        console.log(err);
-        return res.sendStatus(500);
-    })
-}
-
-module.exports = { getAllMeals, getMealsByCategory, deleteAllMeals, getMeal, createMeal, modifyMeal, deleteMeal, rateMeal};
+module.exports = { getAllMeals, getMealsByCategory, deleteAllMeals, getMeal, createMeal, modifyMeal, deleteMeal};
