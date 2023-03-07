@@ -8,5 +8,7 @@ router.route('/rating')
     .post(ratingController.rateMeal);
 router.route('/rating/user')
     .get(ratingController.getHistory);
+router.route('/rating/meal')
+    .get(ratingController.getOneRating);
 
 module.exports = router;

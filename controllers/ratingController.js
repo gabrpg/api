@@ -5,6 +5,7 @@ async function rateMeal(req, res){
     try {
         let rating = await RatingMeal.create({
             MealRating: req.body.MealRating,
+            comment: req.body.comment,
             menuMeal: req.body.menuMeal,
             user: req.body.user,
         });
@@ -29,6 +30,17 @@ async function getHistory(req, res){
     }
 }
 
+async function getOneRating(req, res){
+    try {
+        await RatingMeal.find({user: req.query._idUser, menuMeal: req.query._idMeal}).exec( (err, data) => {
+            return res.json(data);
+        })
+    }catch(e) {
+        console.log(e);
+        return res.status(400).json({error: "error when getting rating history"});
+    }
+}
+
 async function getMealRating(req, res){
     try {
         await RatingMeal.find({menuMeal: req.query._id}).exec( (err, data) => {
@@ -40,4 +52,4 @@ async function getMealRating(req, res){
     }
 }
 
-module.exports = {rateMeal, getHistory, getMealRating};
+module.exports = {rateMeal, getHistory, getMealRating, getOneRating};
