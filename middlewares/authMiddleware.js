@@ -1,5 +1,4 @@
 const jwt = require('jsonwebtoken');
-const Users = require('../models/usersModel');
 const isJwtValid = (req, res, next) => {
     let token = req.cookies['SESSIONID'];
 
