@@ -117,9 +117,15 @@ async function verifyEmailToken(req, res) {
                 return res.sendStatus(401);
             }
             if(data) {
-                await clearCookies(req, res);
-                await setupPayload(req, res, {id: data._id, username: data.userName, isAdmin: data.userAdmin, isManager: data.userManager, isVerified: data.userEmailVerified});
-                return res.sendStatus(200);
+                await data.save().then(async () => {
+                    await clearCookies(req, res);
+                    await setupPayload(req, res, {id: data._id, username: data.userName, isAdmin: data.userAdmin, isManager: data.userManager, isVerified: data.userEmailVerified});
+                    return res.sendStatus(200);
+                })
+                    .catch(err => {
+                        console.log(err);
+                        return res.sendStatus(401);
+                    });
             }
         });
     } catch(err) {
@@ -337,13 +343,13 @@ async function googleLogin(req, res){
             sameEmail[0].googleAuth = idToken;
             await sameEmail[0].save();
         }
-        setupPayload(req, res, {id: sameEmail[0]._id, isAdmin: sameEmail[0].userAdmin, isManager: sameEmail[0].userManager, isVerified: sameEmail[0].userEmailVerified});
+        await setupPayload(req, res, {id: sameEmail[0]._id, isAdmin: sameEmail[0].userAdmin, isManager: sameEmail[0].userManager, isVerified: sameEmail[0].userEmailVerified});
         return res.status(200).json({ message: sameEmail });
     }
     const user = new Users({
         userEmail : email,
         userEmailVerified : true,
-        userPassword : 'googleLogin',
+        userPassword : bcrypt.hashSync(generateToken(), 10),
         userManager : false,
         userAdmin : false,
         userAllergenIds: [],
@@ -353,7 +359,7 @@ async function googleLogin(req, res){
     });
     user.save().then(async () => {
         const newUser = await Users.findOne({userEmail: email}).exec();
-        setupPayload(req, res, {id: newUser._id, isAdmin: newUser.userAdmin, isManager: newUser.userManager, isVerified: newUser.userEmailVerified});
+        await setupPayload(req, res, {id: newUser._id, isAdmin: newUser.userAdmin, isManager: newUser.userManager, isVerified: newUser.userEmailVerified});
         return res.status(200).json({message: user});
     })
         .catch(e => {
