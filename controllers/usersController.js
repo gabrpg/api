@@ -118,7 +118,7 @@ async function verifyEmailToken(req, res) {
             }
             if(data) {
                 await data.save().then(async () => {
-                    await setupPayload(req, res, {id: data._id, username: data.userName, isAdmin: data.userAdmin, isManager: data.userManager, isVerified: data.userEmailVerified});
+                    await setupPayload(req, res, {id: data._id, username: data.userName, isAdmin: data.userAdmin, isManager: data.userManager, isVerified: true});
                     return res.sendStatus(200);
                 })
                     .catch(err => {
