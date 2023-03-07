@@ -73,12 +73,18 @@ async function addAddress(req, res) {
 
 
 async function removeAddress(req, res) {
-    await Address.deleteOne({_id: new ObjectId(req.params._id)}).then(() => {
-        return res.status(201);
-    }).catch(err => {
+    try {
+        await Address.deleteOne({_id: new ObjectId(req.body._id)}).exec((err) => {
+            if(err) {
+                console.log(err);
+                res.sendStatus(401);
+            }
+            return res.status(201);
+        });
+    } catch (err) {
         console.log(err);
-        return res.status(401);
-    });
+        return res.status(500);
+    }
 }
 
 async function modifyAccount(req, res){
