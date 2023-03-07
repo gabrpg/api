@@ -1,5 +1,6 @@
 const Address = require('../models/crud/crud-user/address');
 const Users = require("../models/usersModel");
+const PaymentInfo = require("../models/crud/crud-user/paymentInfosModel");
 const ObjectId = require('mongodb').ObjectId;
 const usersController = require('./usersController')
 const bcrypt = require("bcrypt");
@@ -28,6 +29,35 @@ async function getAllInfosByID(req, res) {
     })
 }
 
+async function addPaymentInfo(req, res) {
+    let paymentInfo = new PaymentInfo(req.body);
+
+    const check = { paymentInfoUserId: new ObjectId(paymentInfo.paymentInfoUserId) };
+    const update = { $set: { paymentInfoCardNumber: paymentInfo.paymentInfoCardNumber,
+                             paymentInfoCVV: paymentInfo.paymentInfoCVV,
+                             paymentInfoExpiryMonth: paymentInfo.paymentInfoExpiryMonth,
+                             paymentInfoExpiryYear: paymentInfo.paymentInfoExpiryYear,
+                             paymentInfoUserId: paymentInfo.paymentInfoUserId }};
+    const options = { upsert: true };
+
+    await PaymentInfo.updateOne(check, update, options).then(() => {
+        return res.sendStatus(201);
+    })
+    .catch(err => {
+        console.log(err);
+        return res.status(500);
+    });
+}
+
+async function getPaymentInfo(req, res) {
+    await PaymentInfo.findOne({paymentInfoUserId: new ObjectId(req.params.id)}).then(infos => {
+        return res.status(200).json(infos);
+    })
+    .catch(err => {
+        console.log(err);
+        return res.status(500);
+    });
+}
 
 async function addAddress(req, res) {
     let address = new Address(req.body);
@@ -130,4 +160,4 @@ async function modifyPassword(req, res){
         return res.sendStatus(401);
     });
 }
-module.exports = { addAddress, getAllAddressesByID, removeAddress, getAllInfosByID, modifyAccount, deleteAccount, modifyPassword };
+module.exports = { addPaymentInfo, getPaymentInfo, addAddress, getAllAddressesByID, removeAddress, getAllInfosByID, modifyAccount, deleteAccount, modifyPassword };

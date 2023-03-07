@@ -9,6 +9,10 @@ router.route('/')
     .patch(isJwtValid, isVerified, accountsController.modifyPassword)
 router.route('/delete')
     .post(isJwtValid, isVerified, accountsController.deleteAccount)
+router.route('/payment-info')
+    .post(accountsController.addPaymentInfo);
+router.route('/payment-info/:id')
+    .get(accountsController.getPaymentInfo);
 router.route('/addresses')
     .get(isJwtValid, isVerified, accountsController.getAllAddressesByID)
     .post(isJwtValid, isVerified, accountsController.addAddress)
