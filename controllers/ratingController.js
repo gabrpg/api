@@ -20,7 +20,7 @@ async function rateMeal(req, res){
 
 async function getHistory(req, res){
     try {
-        await RatingMeal.find({user: req.body.user}).exec( (err, data) => {
+        await RatingMeal.find({user: req.query._id}).exec( (err, data) => {
             return res.json(data);
         })
     }catch(e) {
@@ -31,7 +31,7 @@ async function getHistory(req, res){
 
 async function getMealRating(req, res){
     try {
-        await RatingMeal.find({menuMeal: req.body.menuMeal}).exec( (err, data) => {
+        await RatingMeal.find({menuMeal: req.query._id}).exec( (err, data) => {
             return res.json(data);
         })
     }catch(e) {
