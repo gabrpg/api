@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const dotenv = require("dotenv");
+const Users = require('../models/usersModel');
 const isJwtValid = (req, res, next) => {
     let token = req.cookies['SESSIONID'];
 
@@ -43,6 +43,18 @@ const isVerified = async (req, res, next) => {
     next();
 }
 
+const isAuthNotEmpty = (req, res, next) => {
+    if (req.body.userEmail === '' || req.body.userPassword === '')
+        return res.sendStatus(401);
+    next();
+}
+
+const isEmailNotEmpty = (req, res, next) => {
+    if (req.body.userEmail === '')
+        return res.sendStatus(401);
+    next();
+}
+
 const isManager = (req, res, next) => {
     if (req.payload.isManager === undefined || !req.payload.isManager)
         return res.sendStatus(401);
@@ -54,5 +66,7 @@ module.exports = {
     isAdmin,
     isManager,
     isVerified,
-    checkUserIdentity
+    checkUserIdentity,
+    isAuthNotEmpty,
+    isEmailNotEmpty,
 }
