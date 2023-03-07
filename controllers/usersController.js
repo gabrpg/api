@@ -117,14 +117,8 @@ async function verifyEmailToken(req, res) {
                 return res.sendStatus(401);
             }
             if(data) {
-                await data.save().then(async () => {
-                    await setupPayload(req, res, {id: data._id, username: data.userName, isAdmin: data.userAdmin, isManager: data.userManager, isVerified: true});
-                    return res.sendStatus(200);
-                })
-                    .catch(err => {
-                        console.log(err);
-                        return res.sendStatus(401);
-                    });
+                await setupPayload(req, res, {id: data._id, username: data.userName, isAdmin: data.userAdmin, isManager: data.userManager, isVerified: true});
+                return res.sendStatus(200);
             }
         });
     } catch(err) {
