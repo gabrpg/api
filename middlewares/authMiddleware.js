@@ -15,19 +15,6 @@ const isJwtValid = (req, res, next) => {
     })
 }
 
-//TODO: middleware useless pour le moment
-const checkUserIdentity = (req, res, next) => {
-    if (!req.payload) {
-        return res.status(401).json({ message: 'Vous devez être connecté pour effectuer cette action.' });
-    }
-
-    if (req.cookies['SESSION_INFO'].id !== req.payload.id) {
-        return res.status(403).json({ message: 'Vous n\'êtes pas autorisé à modifier les informations de cet utilisateur.' });
-    }
-
-    next();
-}
-
 const isAdmin = async (req, res, next) => {
     if (req.payload.isAdmin === undefined || !req.payload.isAdmin)
         return res.sendStatus(401);
@@ -65,7 +52,6 @@ module.exports = {
     isAdmin,
     isManager,
     isVerified,
-    checkUserIdentity,
     isAuthNotEmpty,
     isEmailNotEmpty,
 }
