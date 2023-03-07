@@ -73,7 +73,7 @@ async function addAddress(req, res) {
 
 
 async function removeAddress(req, res) {
-    await Address.deleteOne({userId: new ObjectId(req.cookies['SESSION_INFO'].id) }).then(() => {
+    await Address.deleteOne({_id: new ObjectId(req.params._id)}).then(() => {
         return res.status(201);
     }).catch(err => {
         console.log(err);
