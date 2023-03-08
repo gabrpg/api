@@ -6,7 +6,7 @@ async function rateMeal(req, res){
         let rating = await RatingMeal.create({
             MealRating: req.body.MealRating,
             comment: req.body.comment,
-            menuMeal: req.body.menuMeal,
+            menuMeal: req.body.meal,
             user: req.body.user,
         });
         await rating.save().then(() => {
