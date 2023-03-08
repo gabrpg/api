@@ -15,10 +15,10 @@ async function getMealsByCategory(req, res) {
         let mealsByCategory = [];
         for (let i = 0; i < meals.length; i++) {
             for (let j = 0; j < meals[i].menuMealCategories.length; j++) {
-                if (mealsByCategory.filter(x => x.categoryName === meals[i].menuMealCategories[j].menuCategoryName).length === 0)
-                    mealsByCategory.push({categoryName: meals[i].menuMealCategories[j].menuCategoryName, categoryMeals: []});
+                if (mealsByCategory.filter(x => x.menuCategoryName === meals[i].menuMealCategories[j].menuCategoryName).length === 0)
+                    mealsByCategory.push({menuCategoryName: meals[i].menuMealCategories[j].menuCategoryName, menuCategoryMeals: []});
 
-                mealsByCategory.find(x => x.categoryName === meals[i].menuMealCategories[j].menuCategoryName).categoryMeals.push(meals[i]);
+                mealsByCategory.find(x => x.menuCategoryName === meals[i].menuMealCategories[j].menuCategoryName).menuCategoryMeals.push(meals[i]);
             }
         }
         return res.status(200).json(mealsByCategory);
