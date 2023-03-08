@@ -3,7 +3,7 @@ let usersController = require('../controllers/usersController');
 let router = express.Router();
 const { isJwtValid, isManager, isAdmin } = require('../middlewares/authMiddleware');
 router.route('/')
-    .get(isJwtValid, usersController.getOne);
+    .get(usersController.getOne);
 router.route('/register')
     .post(usersController.register)
 router.route('/login')

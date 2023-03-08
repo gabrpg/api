@@ -57,12 +57,12 @@ async function addToCart(req, res) {
 }
 
 async function emptyCart(req, res) {
-    Users.findOneAndUpdate({_id: new ObjectId(req.payload.id)}, {userCart: []}).select("-userPassword").then(user => {
+    Users.findOneAndUpdate({_id: new ObjectId(req.params.id || req.payload.id)}, {userCart: []}).select("-userPassword").then(user => {
         return res.status(204).json(user);
     })
     .catch(e => {
         console.log(e);
-        return res.sendStatus(500);
+        return res.sendStatus(500).json(e);
     })
 }
 
