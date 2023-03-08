@@ -6,9 +6,9 @@ const { isJwtValid, isManager, isAdmin } = require('../middlewares/authMiddlewar
 router.route('/rating')
     .get(ratingController.getMealRating)
     .post(ratingController.rateMeal);
-router.route('/rating/user')
+router.route('/rating/user/:id')
     .get(ratingController.getHistory);
-router.route('/rating/meal')
+router.route('/rating/meal/:id')
     .get(ratingController.getOneRating);
 
 module.exports = router;
