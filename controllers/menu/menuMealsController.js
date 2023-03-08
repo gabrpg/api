@@ -12,23 +12,24 @@ async function getAllMeals(req, res) {
 async function getMealsByCategory(req, res) {
     try { 
         let meals = await MenuMeals.find().populate('menuMealAllergens menuMealCategories');
-        const map = new Map();
+        let mealsByCategory = [];
         for (let i = 0; i < meals.length; i++) {
             for (let j = 0; j < meals[i].menuMealCategories.length; j++) {
-                const key = meals[i].menuMealCategories[j].menuCategoryName;
-                const collection = map.get(key);
-                if (!collection) {
-                    map.set(key, [meals[i]]);
-                } else {
-                    collection.push(meals[i]);
-                }
+                if (mealsByCategory.filter(x => x.categoryName === meals[i].menuMealCategories[j].menuCategoryName).length === 0)
+                    mealsByCategory.push({categoryName: meals[i].menuMealCategories[j].menuCategoryName, meals: []});
+
+                mealsByCategory.find(x => x.categoryName === meals[i].menuMealCategories[j].menuCategoryName).meals.push(meals[i]);
             }
         }
-        return res.status(200).json(Object.fromEntries(map));
+        return res.status(200).json(mealsByCategory);
     } catch (e) {
         console.log(e);
         return res.status(400).json({error: "error when getting item"});
     }
+
+
+
+
 }
 async function deleteAllMeals(req, res) {
     try {
