@@ -2,7 +2,7 @@ let express = require('express');
 let ordersController = require('../controllers/ordersController');
 let router = express.Router();
 const { isJwtValid, isManager, isAdmin } = require('../middlewares/authMiddleware');
-router.route('/user')
+router.route('/user/:id')
     .get(isJwtValid, ordersController.getUserOrders)
     .post(isJwtValid, ordersController.createOrder);
 router.route('/store')
