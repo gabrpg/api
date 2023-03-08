@@ -32,7 +32,7 @@ async function getHistory(req, res){
 
 async function getOneRating(req, res){
     try {
-        await RatingMeal.find({user: req.query._idUser, menuMeal: req.query._idMeal}).exec( (err, data) => {
+        await RatingMeal.find({menuMeal: req.query._idMeal}).exec( (err, data) => {
             return res.json(data);
         })
     }catch(e) {
