@@ -14,7 +14,6 @@ const user = new mongoose.Schema(
         userPasswordToken : { type: String, required: false },
         userManager: { type: Boolean, required: true, default: false},
         userAdmin: { type: Boolean, required: true, default: false },
-        userPaymentInfo: { type: ObjectId, required: false },
         userCart: { type: [cartModel.schema], required: true, default: [] },
         userAllergenIds: [{ type: ObjectId, ref: 'MenuAllergenModel' , default: []}],
         googleAuth : {type: String, required: false, default : ''}

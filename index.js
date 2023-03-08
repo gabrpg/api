@@ -30,6 +30,8 @@ app.use('/accounts', require('./routes/accountsRoutes'));
 app.use('/users', require('./routes/usersRoutes'));
 app.use('/images', require('./routes/imagesRoutes'));
 app.use('/stats', require('./routes/StatsRoute'));
+app.use('/rating', require('./routes/ratingRoutes'));
+app.use('/mobile', require('./routes/mobileRoutes'));
 app.use('/images', express.static('./images'));
 
 

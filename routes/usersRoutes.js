@@ -1,13 +1,13 @@
 let express = require('express');
 let usersController = require('../controllers/usersController');
 let router = express.Router();
-const { isJwtValid, isManager, isAdmin } = require('../middlewares/authMiddleware');
+const { isJwtValid, isManager, isAdmin, isAuthNotEmpty, isEmailNotEmpty} = require('../middlewares/authMiddleware');
 router.route('/')
     .get(usersController.getOne);
 router.route('/register')
-    .post(usersController.register)
+    .post(isAuthNotEmpty, usersController.register)
 router.route('/login')
-    .post(usersController.login)
+    .post(isAuthNotEmpty, usersController.login)
 router.route('/logout')
     .post(usersController.logout)
 router.route('/managers')
@@ -17,9 +17,9 @@ router.route('/:id')
 router.route('/verify-email/:token')
     .get(usersController.verifyEmailToken);
 router.route('/verify-new')
-    .post(usersController.newVerficationToken)
+    .post(isJwtValid, usersController.newVerficationToken)
 router.route('/forgot-password')
-    .post(usersController.newPassword)
+    .post(isEmailNotEmpty, usersController.newPassword)
 router.route('/verify-password/:token')
     .get(usersController.verifyPasswordToken)
 router.route('/modify-password')

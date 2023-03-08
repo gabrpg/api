@@ -10,4 +10,4 @@ const menuMeal = new mongoose.Schema(
         menuMealCategories: [{type: ObjectId, ref: 'MenuCategoryModel'}],
     }
 );
-module.exports = mongoose.model('MenuMealModel', menuMeal);;
+module.exports = mongoose.model('MenuMealModel', menuMeal);

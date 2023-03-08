@@ -22,6 +22,20 @@ async function getUserOrders(req, res) {
             return res.status(400);
         }
         else {
+            console.log(orders)
+            return res.json(orders);
+        }
+    })
+}
+
+async function getUserOrdersById(req, res) {
+    Orders.find({orderUserId: req.params.id}).exec((err, orders) => {
+        if (err) {
+            console.log(err);
+            return res.status(400);
+        }
+        else {
+            console.log(orders)
             return res.json(orders);
         }
     })
@@ -50,4 +64,15 @@ async function createOrder(req, res) {
     });
 }
 
-module.exports = { getAllOrders, getStoreOrders, getUserOrders, createOrder };
+async function createOrderById(req, res) {
+    await Orders.create({
+        orderDate: req.body.date,
+        orderTotal: req.body.total,
+        orderMeals: req.body.meals,
+        orderUserId: new ObjectId(req.params.id),
+    }).then(function (result) {
+        return res.status(200).json(result);
+    });
+}
+
+module.exports = { getAllOrders, getUserOrdersById, getStoreOrders, getUserOrders, createOrder, createOrderById };

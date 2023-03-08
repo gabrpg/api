@@ -1,5 +1,6 @@
 const MenuMeals = require('../../models/menu/menuMealModel');
 const MenuCategory = require("../../models/menu/menuCategoryModel");
+const Users = require("../../models/usersModel");
 async function getAllMeals(req, res) {
     try {
         return res.status(200).json(await MenuMeals.find().populate('menuMealAllergens menuMealCategories'));
@@ -9,25 +10,26 @@ async function getAllMeals(req, res) {
     }
 }
 async function getMealsByCategory(req, res) {
-    try {
+    try { 
         let meals = await MenuMeals.find().populate('menuMealAllergens menuMealCategories');
-        const map = new Map();
-        for (let i = 0; i < meals.count; i++) {
+        let mealsByCategory = [];
+        for (let i = 0; i < meals.length; i++) {
             for (let j = 0; j < meals[i].menuMealCategories.length; j++) {
-                const key = meals[i].menuMealCategories[j].menuCategoryName;
-                const collection = map.get(key);
-                if (!collection) {
-                    map.set(key, [meals[i]]);
-                } else {
-                    collection.push(meals[i]);
-                }
+                if (mealsByCategory.filter(x => x.menuCategoryName === meals[i].menuMealCategories[j].menuCategoryName).length === 0)
+                    mealsByCategory.push({menuCategoryName: meals[i].menuMealCategories[j].menuCategoryName, menuCategoryMeals: []});
+
+                mealsByCategory.find(x => x.menuCategoryName === meals[i].menuMealCategories[j].menuCategoryName).menuCategoryMeals.push(meals[i]);
             }
         }
-        return res.status(200).json(JSON.stringify(Object.fromEntries(map)));
+        return res.status(200).json(mealsByCategory);
     } catch (e) {
         console.log(e);
         return res.status(400).json({error: "error when getting item"});
     }
+
+
+
+
 }
 async function deleteAllMeals(req, res) {
     try {
@@ -95,4 +97,5 @@ async function deleteMeal(req, res) {
         return res.status(400).json({error: "error when deleting item"});
     }
 }
-module.exports = { getAllMeals, getMealsByCategory, deleteAllMeals, getMeal, createMeal, modifyMeal, deleteMeal };
+
+module.exports = { getAllMeals, getMealsByCategory, deleteAllMeals, getMeal, createMeal, modifyMeal, deleteMeal};
