@@ -12,7 +12,7 @@ async function getAllAddressesByID(req, res) {
             return res.json(data);
         } else {
             console.log(err);
-            return res.sendStatus(403);
+            return res.sendStatus(401);
         }
     });
 }
@@ -24,7 +24,7 @@ async function getAllInfosByID(req, res) {
         }
         else {
             console.log(err);
-            return res.sendStatus(403);
+            return res.sendStatus(401);
         }
     })
 }
@@ -60,15 +60,20 @@ async function getPaymentInfo(req, res) {
 }
 
 async function addAddress(req, res) {
-    let address = new Address(req.body);
-    address.userId = new ObjectId(req.cookies['SESSION_INFO'].id);
-    await address.save().then(() => {
-        return res.sendStatus(201);
-    })
-        .catch(err => {
-            console.log(err);
-            return res.sendStatus(401)
-        });
+    try {
+        let address = new Address(req.body);
+        address.userId = new ObjectId(req.cookies['SESSION_INFO'].id);
+        await address.save().then(() => {
+            return res.sendStatus(201);
+        })
+            .catch(err => {
+                console.log(err);
+                return res.sendStatus(401);
+            });
+    } catch (err) {
+        console.log(err);
+        return res.sendStatus(501);
+    }
 }
 
 
@@ -88,82 +93,102 @@ async function removeAddress(req, res) {
 }
 
 async function modifyAccount(req, res){
-   await Users.findOne({userEmail: req.body.userEmail}).then( async (data,) => {
-        if(data !== null){
-            if(req.cookies['SESSION_INFO'].id !== data._id.toString()){
-                return res.sendStatus(419);
-            }
-        }
+    try {
+       await Users.findOne({userEmail: req.body.userEmail}).exec( async (err,data) => {
+           if(err){
+               console.log(err);
+               return res.sendStatus(401);
+           }
 
-        if(data === null || req.cookies['SESSION_INFO'].id === data._id.toString()){
-            await Users.findOne({_id: new ObjectId(req.cookies['SESSION_INFO'].id)}).then( async (data,) => {
-                if(data.userEmail !== req.body.userEmail){
-                    data.userEmail = req.body.userEmail;
+            if(data){
+                if(req.cookies['SESSION_INFO'].id !== data._id.toString()){
+                    return res.sendStatus(401);
                 }
-                data.userRealName = req.body.userRealName;
-                data.userLastName = req.body.userLastName;
-                data.userPhoneNumber = req.body.userPhoneNumber;
-                await data.save().then(() => {
-                    return res.sendStatus(204);
-                })
-                    .catch(() => {
-                        return res.sendStatus(401)
+            }
+
+            if(!data || req.cookies['SESSION_INFO'].id === data._id.toString()){
+                try {
+                    await Users.findOne({_id: new ObjectId(req.cookies['SESSION_INFO'].id)}).exec(async (err,data) => {
+                        if(err){
+                            console.log(err);
+                            return res.sendStatus(401);
+                        }
+
+                        if(data.userEmail !== req.body.userEmail){
+                            data.userEmail = req.body.userEmail;
+                        }
+                        data.userRealName = req.body.userRealName;
+                        data.userLastName = req.body.userLastName;
+                        data.userPhoneNumber = req.body.userPhoneNumber;
+
+                        await data.save().then(() => {
+                            return res.sendStatus(204);
+                        })
+                            .catch(() => {
+                                return res.sendStatus(401)
+                            });
                     });
-            })
-                .catch((err) => {
+                } catch(err) {
                     console.log(err);
-                    if (err.status === 504){
-                        return res.status(504).json(err)
-                    }
-                });
-        }
-    })
-    .catch((err) => {
+                    return res.sendStatus(500)
+                }
+            }
+       });
+    } catch (err) {
         console.log(err);
-        if (err.status === 504){
-            return res.status(504).json(err)
-        }
-    });
+        return res.sendStatus(500)
+    }
 }
 
 async function deleteAccount(req, res) {
-    await Users.deleteOne({ _id: new ObjectId(req.body._id) }).then(async () =>{
-        await Address.deleteMany({ userId: new ObjectId(req.body._id) }).then(async() => {
-            await usersController.logout(req, res);
-        })
-            .catch(err => {
+    try {
+        await Users.deleteOne({ _id: new ObjectId(req.body._id) }).exec(async (err) =>{
+            if(err){
                 console.log(err);
                 return res.sendStatus(401);
+            }
+            try {
+                await Address.deleteMany({ userId: new ObjectId(req.body._id) }).exec(async(err) => {
+                    if(err){
+                        console.log(err);
+                        return res.sendStatus(401);
+                    }
+                    await usersController.logout(req, res);
+                });
+            }catch(err) {
+                console.log(err);
+                return res.sendStatus(500);
+            }
         });
-    })
-    .catch(err => {
+    } catch(err) {
         console.log(err);
-        return res.sendStatus(401);
-    });
+        return res.sendStatus(500);
+    }
 }
 
 async function modifyPassword(req, res){
-    await Users.findOne({_id: new ObjectId(req.cookies['SESSION_INFO'].id)}).then( async (data,) => {
-        if(bcrypt.compareSync(req.body.oldPassword, data.userPassword)){
-            data.userPassword = bcrypt.hashSync(req.body.userPassword, 10);
-            await data.save(function(err) {
-                if(!err) {
+    try {
+        await Users.findOne({_id: new ObjectId(req.cookies['SESSION_INFO'].id)}).exec( async (err,data) => {
+            if(err){
+                console.log(err);
+                return res.sendStatus(401);
+            }
+
+            if(bcrypt.compareSync(req.body.oldPassword, data.userPassword)){
+                data.userPassword = bcrypt.hashSync(req.body.userPassword, 10);
+                await data.save().then(()=>{
                     return res.sendStatus(201);
-                }
-                else {
-                    console.log(err);
-                    return res.sendStatus(401);
-                }
-            });
-        } else if (!bcrypt.compareSync(req.body.oldPassword, data.userPassword)) {
-            return res.sendStatus(419);
-        } else {
-            return res.sendStatus(401);
-        }
-    })
-    .catch(err => {
+                });
+            } else if (!bcrypt.compareSync(req.body.oldPassword, data.userPassword)) {
+                return res.sendStatus(419);
+            } else {
+                return res.sendStatus(401);
+            }
+        });
+    }catch(err) {
         console.log(err);
-        return res.sendStatus(401);
-    });
+        return res.sendStatus(500);
+    }
 }
+
 module.exports = { addPaymentInfo, getPaymentInfo, addAddress, getAllAddressesByID, removeAddress, getAllInfosByID, modifyAccount, deleteAccount, modifyPassword };
