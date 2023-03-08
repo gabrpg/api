@@ -2,13 +2,15 @@ const RatingMeal = require('../models/ratingModel');
 
 
 async function rateMeal(req, res){
+    console.log(req.body.meal)
     try {
         let rating = await RatingMeal.create({
             MealRating: req.body.MealRating,
             comment: req.body.comment,
-            menuMeal: req.body.meal,
+            meal: req.body.meal,
             user: req.body.user,
         });
+        console.log(rating)
         await rating.save().then(() => {
             return res.sendStatus(201);
         })
