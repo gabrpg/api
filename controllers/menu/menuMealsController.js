@@ -11,7 +11,7 @@ async function getAllMeals(req, res) {
 }
 async function getMealsByCategory(req, res) {
     try { 
-        let meals = await MenuMeals.find().populate('menuMealAllergens menuMealCategories');
+        let meals = await MenuMeals.find().populate('menuMealCategories');
         let mealsByCategory = [];
         for (let i = 0; i < meals.length; i++) {
             for (let j = 0; j < meals[i].menuMealCategories.length; j++) {
