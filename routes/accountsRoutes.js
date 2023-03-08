@@ -26,5 +26,6 @@ router.route('/cart')
     .put(isJwtValid, usersController.replaceCart);
 router.route('/cart/:id')
     .get(usersController.getCart)
-    .delete(usersController.emptyCart);
+    .delete(usersController.emptyCart)
+    .post(usersController.replaceCart);
 module.exports = router;

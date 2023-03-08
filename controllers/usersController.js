@@ -67,7 +67,7 @@ async function emptyCart(req, res) {
 }
 
 async function replaceCart(req, res) {
-    Users.findOneAndUpdate({_id: new ObjectId(req.payload.id)}, {userCart: req.body}).select("-userPassword").then(user => {
+    Users.findOneAndUpdate({_id: new ObjectId(req.params.id)}, {userCart: req.body}).select("-userPassword").then(user => {
         return res.status(200).json(user);
     })
     .catch(e => {
