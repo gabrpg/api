@@ -16,8 +16,7 @@ async function getAllOrders(req, res) {
 }
 
 async function getUserOrders(req, res) {
-    console.log(req.params.id || req.payload.id)
-    Orders.find({orderUserId: req.params.id}).exec((err, orders) => {
+    Orders.find({orderUserId: req.params.id || req.payload.id}).exec((err, orders) => {
         if (err) {
             console.log(err);
             return res.status(400);
