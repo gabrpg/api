@@ -59,6 +59,21 @@ async function getPaymentInfo(req, res) {
     });
 }
 
+async function replaceAllergies(req, res) {
+    let allergies = req.body;
+
+    const check = { _id: new ObjectId(req.params.id) };
+    const update = { $set: { userAllergenIds: allergies } };
+
+    await Users.updateOne(check, update).then(() => {
+        return res.sendStatus(201);
+    })
+    .catch(err => {
+        console.log(err);
+        return res.status(500);
+    });
+}
+
 async function addAddress(req, res) {
     try {
         let address = new Address(req.body);
@@ -191,4 +206,4 @@ async function modifyPassword(req, res){
     }
 }
 
-module.exports = { addPaymentInfo, getPaymentInfo, addAddress, getAllAddressesByID, removeAddress, getAllInfosByID, modifyAccount, deleteAccount, modifyPassword };
+module.exports = { addPaymentInfo, getPaymentInfo, replaceAllergies, addAddress, getAllAddressesByID, removeAddress, getAllInfosByID, modifyAccount, deleteAccount, modifyPassword };

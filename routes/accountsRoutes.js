@@ -13,6 +13,8 @@ router.route('/payment-info')
     .post(accountsController.addPaymentInfo);
 router.route('/payment-info/:id')
     .get(accountsController.getPaymentInfo);
+router.route('/allergies/:id')
+    .post(accountsController.replaceAllergies);
 router.route('/addresses')
     .get(isJwtValid, isVerified, accountsController.getAllAddressesByID)
     .post(isJwtValid, isVerified, accountsController.addAddress)
