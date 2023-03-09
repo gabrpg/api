@@ -12,6 +12,8 @@ router.route('/logout')
     .post(usersController.logout)
 router.route('/managers')
     .get(usersController.getAllManagers);
+router.route('/customers')
+    .get(usersController.getAllCustomers);
 router.route('/:id')
     .get(usersController.getOne);
 router.route('/verify-email/:token')

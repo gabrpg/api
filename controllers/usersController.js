@@ -35,6 +35,17 @@ async function getAllManagers(req, res) {
         });
 }
 
+async function getAllCustomers(req, res) {
+    await Users.find().select("-userPassword")
+        .then(customers => {
+            return res.status(200).json(customers.filter(x => !x.userManager));
+        })
+        .catch( e => {
+            console.log(e);
+            return res.status(400).json(e);
+        });
+}
+
 async function getCart(req, res) {
     await Users.findOne({_id: new ObjectId(req.params.id || req.payload.id)}).select("userCart -_id")
         .then(cart => {
@@ -360,4 +371,4 @@ async function googleLogin(req, res){
         });
 }
 
-module.exports = { getOne, getAllManagers, register, login, logout, getCart, addToCart, emptyCart, replaceCart, verifyEmailToken, newVerficationToken, newPassword, verifyPasswordToken, modifyPasswordAfterVerification, googleLogin };
+module.exports = { getOne, getAllManagers, register, login, logout, getCart, addToCart, emptyCart, replaceCart, verifyEmailToken, newVerficationToken, newPassword, verifyPasswordToken, modifyPasswordAfterVerification, googleLogin,  getAllCustomers};
