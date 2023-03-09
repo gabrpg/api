@@ -20,7 +20,7 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 3000;
 
 mongoose.set('strictQuery', false);
-console.log(process.env.DB_CONNECT);
+
 mongoose.connect(process.env.DB_CONNECT).then(()=> console.log('Connected to DB'),  { useNewUrlParser: true, useUnifiedTopology: true });
 
 app.use('/menu', require("./routes/menuRoutes"));
