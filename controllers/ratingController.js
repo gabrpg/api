@@ -41,7 +41,7 @@ async function getHistory(req, res){
 
 async function getOneRating(req, res){
     try {
-        await RatingMeal.find({menuMeal: req.params.id}).exec( (err, data) => {
+        await RatingMeal.find({meal: req.params.id}).exec( (err, data) => {
             return res.json(data);
         })
     }catch(e) {
@@ -50,15 +50,4 @@ async function getOneRating(req, res){
     }
 }
 
-async function getMealRating(req, res){
-    try {
-        await RatingMeal.find({menuMeal: req.params.id}).exec( (err, data) => {
-            return res.json(data);
-        })
-    }catch(e) {
-        console.log(e);
-        return res.status(400).json({error: "error when getting rating history"});
-    }
-}
-
-module.exports = {rateMeal, getHistory, getMealRating, getOneRating};
+module.exports = {rateMeal, getHistory, getOneRating};
