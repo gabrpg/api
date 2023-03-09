@@ -289,7 +289,7 @@ async function login(req, res){
 
             if (data){
                 if(bcrypt.compareSync(req.body.userPassword, data.userPassword)){
-                    await setupPayload(req, res, {id: data._id, username: data.userName, isAdmin: data.userAdmin, isManager: data.userManager, isVerified: data.userEmailVerified});
+                    await setupPayload(req, res, {id: data._id, isAdmin: data.userAdmin, isManager: data.userManager, isVerified: data.userEmailVerified});
                     return res.sendStatus(201);
                 }
             }
@@ -311,8 +311,11 @@ function setEnvValue(key, value) {
 }
 
 async function setupPayload(req, res, payload) {
-    await setEnvValue('KEY', generateToken());
-    let jwtToken = jwt.sign(payload, process.env.KEY, {expiresIn: '2h'});
+    let newKey = generateToken();
+    console.log(newKey);
+    let jwtToken = jwt.sign(payload, newKey, {expiresIn: '2h'});
+    await setEnvValue('KEY', newKey);
+
     res.cookie("SESSIONID", jwtToken, {httpOnly: true});
     res.cookie("SESSION_INFO", payload);
 }

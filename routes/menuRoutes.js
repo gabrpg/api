@@ -9,7 +9,7 @@ router.route('/meals').get(menuMealsController.getAllMeals).delete(isJwtValid, i
 router.route('/meals/:_id')
     .get(menuMealsController.getMeal)
     .put(isJwtValid, isAdmin, menuMealsController.modifyMeal)
-    .delete(isAdmin,menuMealsController.deleteMeal);
+    .delete(isJwtValid, isAdmin, menuMealsController.deleteMeal);
 router.route('/categories').get(menuCategoriesController.getAllCategories).delete(isJwtValid, isAdmin, menuCategoriesController.deleteAllCategories).post(isJwtValid, isAdmin, menuCategoriesController.createCategory);
 router.route('/categories/:_id')
     .get(menuCategoriesController.getCategory)
