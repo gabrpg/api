@@ -1,5 +1,6 @@
 const RatingMeal = require('../models/ratingModel');
 const Users = require("../models/usersModel");
+const Orders = require("../models/ordersModel");
 
 
 async function rateMeal(req, res){
@@ -29,25 +30,27 @@ async function rateMeal(req, res){
 }
 
 async function getHistory(req, res){
-    try {
-        await RatingMeal.find({user: req.params.id}).exec( (err, data) => {
-            return res.json(data);
-        })
-    }catch(e) {
-        console.log(e);
-        return res.status(400).json({error: "error when getting rating history"});
-    }
+    RatingMeal.find({user: req.params.id}).exec((err, rating) => {
+        if (err) {
+            console.log(err);
+            return res.status(400);
+        }
+        else {
+            return res.json(rating);
+        }
+    })
 }
 
 async function getOneRating(req, res){
-    try {
-        await RatingMeal.find({meal: req.params.id}).exec( (err, data) => {
-            return res.json(data);
-        })
-    }catch(e) {
-        console.log(e);
-        return res.status(400).json({error: "error when getting rating history"});
-    }
+    RatingMeal.find({meal: req.params.id}).exec((err, rating) => {
+        if (err) {
+            console.log(err);
+            return res.status(400);
+        }
+        else {
+            return res.json(rating);
+        }
+    })
 }
 
 module.exports = {rateMeal, getHistory, getOneRating};
