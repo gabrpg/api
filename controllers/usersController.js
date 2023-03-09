@@ -311,11 +311,8 @@ function setEnvValue(key, value) {
 }
 
 async function setupPayload(req, res, payload) {
-    let newKey = generateToken();
-    console.log(newKey);
-    let jwtToken = jwt.sign(payload, newKey, {expiresIn: '2h'});
-    await setEnvValue('KEY', newKey);
-
+    await setEnvValue('KEY', generateToken());
+    let jwtToken = jwt.sign(payload, process.env.KEY, {expiresIn: '2h'});
     res.cookie("SESSIONID", jwtToken, {httpOnly: true});
     res.cookie("SESSION_INFO", payload);
 }
