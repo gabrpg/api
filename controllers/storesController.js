@@ -36,7 +36,7 @@ async function createStore(req, res) {
     let manager = req.body.storeManagerId;
 
     if(manager) {
-         manager = new ObjectId(manager[0]);
+         manager = new ObjectId(manager);
     } else {
         manager = null;
     }
