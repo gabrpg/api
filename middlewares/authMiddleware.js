@@ -47,10 +47,19 @@ const isManager = (req, res, next) => {
 
     next();
 }
+
+const isAdminOrManager = (req, res, next) => {
+    if ((req.payload.isManager === undefined || !req.payload.isManager) && (req.payload.isAdmin === undefined || !req.payload.isAdmin))
+        return res.sendStatus(401);
+
+    next();
+}
+
 module.exports = {
     isJwtValid,
     isAdmin,
     isManager,
+    isAdminOrManager,
     isVerified,
     isAuthNotEmpty,
     isEmailNotEmpty,

@@ -22,7 +22,6 @@ async function getUserOrders(req, res) {
             return res.status(400);
         }
         else {
-            console.log(orders)
             return res.json(orders);
         }
     })
