@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
-require('dotenv').config();
+
 
 async function getOne(req, res) {
     try {
@@ -23,6 +23,7 @@ async function getOne(req, res) {
         return res.status(400).json({error: "error when getting item"});
     }
 }
+
 async function getAllManagers(req, res) {
     await Users.find().select("-userPassword")
         .then(managers => {
@@ -91,7 +92,7 @@ function generateToken() {
     return crypto.randomBytes(32).toString('hex');
 }
 
-function sendVerificationLink(message) {
+async function sendVerificationLink(message) {
 
     const transporter = nodemailer.createTransport({
         host:'smtp.gmail.com',
@@ -108,7 +109,7 @@ function sendVerificationLink(message) {
         },
     });
 
-    transporter.sendMail(message, function(err, info){
+    await transporter.sendMail(message, function(err, info){
         if (err) {
             console.log('Email error: ' + err);
         } else {
@@ -142,7 +143,7 @@ async function verifyPasswordToken(req, res) {
     try {
         await clearCookies(req, res);
 
-        await Users.findOne({userPasswordToken: req.params.token}).exec((err, data) => {
+        await Users.findOneAndUpdate({userPasswordToken: req.params.token} , { userPasswordToken: null }).exec((err, data) => {
             if(err || !data){
                 if(err){
                     console.log(err);
@@ -187,7 +188,7 @@ async function modifyPasswordAfterVerification(req, res){
     }
 }
 
-async function newVerficationToken(req, res) {
+async function newVerficationTokenForEmail(req, res) {
     try {
         await Users.findOne({_id: new ObjectId(req.cookies['SESSION_INFO'].id)}).exec(async (err, data) => {
             if(err || !data){
@@ -220,7 +221,7 @@ async function newVerficationToken(req, res) {
     }
 }
 
-async function newPassword(req, res){
+async function newVerficationTokenForPassword(req, res){
     try {
         await Users.findOne({userEmail: req.body.userEmail}).exec(async (err, data)=> {
             if(err || !data){
@@ -366,4 +367,4 @@ async function googleLogin(req, res){
         });
 }
 
-module.exports = { getOne, getAllManagers, register, login, logout, getCart, addToCart, emptyCart, replaceCart, verifyEmailToken, newVerficationToken, newPassword, verifyPasswordToken, modifyPasswordAfterVerification, googleLogin,  getAllCustomers};
+module.exports = { getOne, getAllManagers, register, login, logout, getCart, addToCart, emptyCart, replaceCart, verifyEmailToken, newVerficationTokenForEmail, newVerficationTokenForPassword, verifyPasswordToken, modifyPasswordAfterVerification, googleLogin,  getAllCustomers};
