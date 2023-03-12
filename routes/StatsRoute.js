@@ -6,5 +6,7 @@ const { isJwtValid, isManager, isAdmin } = require('../middlewares/authMiddlewar
 
 router.route('/sales/:days')
     .get(isJwtValid, isAdmin, statsController.getSalesStats);
+router.route('/summary/:time')
+    .get(isJwtValid, isAdmin, statsController.getSummary);
 
 module.exports = router;
