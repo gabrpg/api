@@ -308,7 +308,7 @@ async function login(req, res){
     }
 }
 
-async function setupPayload(req, res, payload) {
+function setupPayload(req, res, payload) {
     let jwtToken = jwt.sign(payload, process.env.KEY , {expiresIn: '2h'});
     res.cookie("SESSIONID", jwtToken, {httpOnly: true});
     res.cookie("SESSION_INFO", payload);
