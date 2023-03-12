@@ -1,15 +1,14 @@
-const Users = require('../models/usersModel');
+const Users = require('../../models/users/usersModel');
 const ObjectId = require('mongodb').ObjectId;
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
-const fs = require("fs");
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
-const os = require("os");
+require('dotenv').config();
 
 async function getOne(req, res) {
     try {
-        Users.findOne({_id: new ObjectId(req.params.id || req.payload.id)}).select("-userPassword").exec((err, user) => {
+        Users.findOne({_id: new ObjectId(req.params.id || req.payload.id)}).select("-userPassword -googleAuth").exec((err, user) => {
             if (user && !err) {
                 return res.json(user);
             }
@@ -58,7 +57,7 @@ async function getCart(req, res) {
 }
 
 async function addToCart(req, res) {
-    Users.findOneAndUpdate({_id: new ObjectId(req.payload.id || req.params.id)}, {$push : {userCart: req.body }}).select("-userPassword").then(user => {
+    Users.findOneAndUpdate({_id: new ObjectId(req.payload.id || req.params.id)}, {$push : {userCart: req.body }}).select("-userPassword -googleAuth").then(user => {
         return res.status(204).json(user);
     })
     .catch(error => {
@@ -68,7 +67,7 @@ async function addToCart(req, res) {
 }
 
 async function emptyCart(req, res) {
-    Users.findOneAndUpdate({_id: new ObjectId(req.params.id || req.payload.id)}, {userCart: []}).select("-userPassword").then(user => {
+    Users.findOneAndUpdate({_id: new ObjectId(req.params.id || req.payload.id)}, {userCart: []}).select("-userPassword -googleAuth").then(user => {
         return res.status(204).json(user);
     })
     .catch(e => {
@@ -78,7 +77,7 @@ async function emptyCart(req, res) {
 }
 
 async function replaceCart(req, res) {
-    Users.findOneAndUpdate({_id: new ObjectId(req.params.id || req.payload.id)}, {userCart: req.body}).select("-userPassword").then(user => {
+    Users.findOneAndUpdate({_id: new ObjectId(req.params.id || req.payload.id)}, {userCart: req.body}).select("-userPassword -googleAuth").then(user => {
         return res.status(200).json(user);
     })
     .catch(e => {
@@ -120,6 +119,8 @@ function sendVerificationLink(message) {
 
 async function verifyEmailToken(req, res) {
     try {
+        await clearCookies(req, res);
+
         await Users.findOneAndUpdate({userEmailToken: req.params.token}, {userEmailVerified: true, userEmailToken: null}).exec(async(err, data) => {
             if(err || !data){
                 if(err){
@@ -128,7 +129,6 @@ async function verifyEmailToken(req, res) {
                 return res.sendStatus(401);
             }
             if(data) {
-                await setupPayload(req, res, {id: data._id, username: data.userName, isAdmin: data.userAdmin, isManager: data.userManager, isVerified: true});
                 return res.sendStatus(200);
             }
         });
@@ -300,7 +300,7 @@ async function login(req, res){
 
             if (data){
                 if(bcrypt.compareSync(req.body.userPassword, data.userPassword)){
-                    await setupPayload(req, res, {id: data._id, isAdmin: data.userAdmin, isManager: data.userManager, isVerified: data.userEmailVerified});
+                    await setupPayload(req, res, data.userEmail, {id: data._id, isAdmin: data.userAdmin, isManager: data.userManager, isVerified: data.userEmailVerified , isGooglAuth: false});
                     return res.sendStatus(201);
                 }
             }
@@ -311,19 +311,10 @@ async function login(req, res){
     }
 }
 
-function setEnvValue(key, value) {
-    const data = fs.readFileSync(".env", "utf8").split(os.EOL);
-    const target = data.indexOf(data.find((line) => {
-        return line.match(new RegExp(key));
-    }));
-
-    data.splice(target, 1, `${key}=${value}`);
-    fs.writeFileSync(".env", data.join(os.EOL));
-}
-
-async function setupPayload(req, res, payload) {
-    await setEnvValue('KEY', generateToken());
-    let jwtToken = jwt.sign(payload, process.env.KEY, {expiresIn: '2h'});
+async function setupPayload(req, res, user, payload) {
+    let token = generateToken();
+    await Users.findOneAndUpdate({userEmail: user}, {userToken: token})
+    let jwtToken = jwt.sign(payload, token, {expiresIn: '2h'});
     res.cookie("SESSIONID", jwtToken, {httpOnly: true});
     res.cookie("SESSION_INFO", payload);
 }
@@ -347,7 +338,7 @@ async function googleLogin(req, res){
             sameEmail[0].googleAuth = idToken;
             await sameEmail[0].save();
         }
-        await setupPayload(req, res, {id: sameEmail[0]._id, isAdmin: sameEmail[0].userAdmin, isManager: sameEmail[0].userManager, isVerified: sameEmail[0].userEmailVerified});
+        await setupPayload(req, res, sameEmail[0].userEmail,{id: sameEmail[0]._id, isAdmin: sameEmail[0].userAdmin, isManager: sameEmail[0].userManager, isVerified: sameEmail[0].userEmailVerified, isGooglAuth: true});
         return res.status(200).json({ message: sameEmail });
     }
     const user = new Users({
@@ -363,7 +354,7 @@ async function googleLogin(req, res){
     });
     user.save().then(async () => {
         const newUser = await Users.findOne({userEmail: email}).exec();
-        await setupPayload(req, res, {id: newUser._id, isAdmin: newUser.userAdmin, isManager: newUser.userManager, isVerified: newUser.userEmailVerified});
+        await setupPayload(req, res, newUser.userEmail,{id: newUser._id, isAdmin: newUser.userAdmin, isManager: newUser.userManager, isVerified: newUser.userEmailVerified, isGooglAuth: true});
         return res.status(200).json({message: user});
     })
         .catch(e => {

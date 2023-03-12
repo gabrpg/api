@@ -1,7 +1,7 @@
 let express = require('express');
-let usersController = require('../controllers/usersController');
+let usersController = require('../../controllers/users/usersController');
 let router = express.Router();
-const { isJwtValid, isManager, isAdmin, isAuthNotEmpty, isEmailNotEmpty} = require('../middlewares/authMiddleware');
+const { isJwtValid, isManager, isAdmin, isAuthNotEmpty, isEmailNotEmpty} = require('../../middlewares/authMiddleware');
 router.route('/')
     .get(isJwtValid, usersController.getOne);
 router.route('/register')

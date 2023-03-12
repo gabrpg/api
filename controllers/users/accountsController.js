@@ -1,6 +1,6 @@
-const Address = require('../models/crud/crud-user/address');
-const Users = require("../models/usersModel");
-const PaymentInfo = require("../models/crud/crud-user/paymentInfosModel");
+const Address = require('../../models/crud/crud-user/address');
+const Users = require("../../models/users/usersModel");
+const PaymentInfo = require("../../models/crud/crud-user/paymentInfosModel");
 const ObjectId = require('mongodb').ObjectId;
 const usersController = require('./usersController')
 const bcrypt = require("bcrypt");
@@ -129,9 +129,6 @@ async function modifyAccount(req, res){
                             return res.sendStatus(401);
                         }
 
-                        if(data.userEmail !== req.body.userEmail){
-                            data.userEmail = req.body.userEmail;
-                        }
                         data.userRealName = req.body.userRealName;
                         data.userLastName = req.body.userLastName;
                         data.userPhoneNumber = req.body.userPhoneNumber;

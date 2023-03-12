@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const menuMealModel = require('./menu/menuMealModel');
+const menuMealModel = require('../menu/menuMealModel');
 const ObjectId = mongoose.Schema.Types.ObjectId;
 
 const cart = new mongoose.Schema(

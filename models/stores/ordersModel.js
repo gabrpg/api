@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const cartModel = require('../models/cartsModel');
+const cartModel = require('../users/cartsModel');
 const ObjectId = mongoose.Schema.Types.ObjectId;
 
 const order = new mongoose.Schema(

@@ -1,6 +1,6 @@
 const MenuMeals = require('../../models/menu/menuMealModel');
 const MenuCategory = require("../../models/menu/menuCategoryModel");
-const Users = require("../../models/usersModel");
+const Users = require("../../models/users/usersModel");
 async function getAllMeals(req, res) {
     try {
         return res.status(200).json(await MenuMeals.find().populate('menuMealAllergens menuMealCategories'));

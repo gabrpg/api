@@ -1,8 +1,8 @@
 let express = require('express');
-let usersController = require('../controllers/usersController');
-let accountsController = require('../controllers/accountsController');
+let usersController = require('../../controllers/users/usersController');
+let accountsController = require('../../controllers/users/accountsController');
 let router = express.Router();
-const { isJwtValid, isManager, isAdmin, isVerified } = require('../middlewares/authMiddleware');
+const { isJwtValid, isManager, isAdmin, isVerified } = require('../../middlewares/authMiddleware');
 router.route('/')
     .get(isJwtValid, isVerified, accountsController.getAllInfosByID)
     .put(isJwtValid, isVerified, accountsController.modifyAccount)

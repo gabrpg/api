@@ -1,6 +1,6 @@
-const Orders = require('../models/ordersModel');
+const Orders = require('../models/stores/ordersModel');
 const CartMeal = require('../models/menu/menuMealModel')
-const cartModel = require("../models/cartsModel");
+const cartModel = require("../models/users/cartsModel");
 const ObjectId = require('mongodb').ObjectId;
 
 async function getAllOrders(req, res) {

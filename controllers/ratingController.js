@@ -1,6 +1,6 @@
-const RatingMeal = require('../models/ratingModel');
-const Users = require("../models/usersModel");
-const Orders = require("../models/ordersModel");
+const RatingMeal = require('../models/users/ratingModel');
+const Users = require("../models/users/usersModel");
+const Orders = require("../models/stores/ordersModel");
 
 
 async function rateMeal(req, res){

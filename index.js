@@ -1,8 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const dotenv = require('dotenv').config();
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+require('dotenv').config();
 
 const app = express();
 app.use(express.json());
@@ -26,8 +26,8 @@ mongoose.connect(process.env.DB_CONNECT).then(()=> console.log('Connected to DB'
 app.use('/menu', require("./routes/menuRoutes"));
 app.use('/stores', require('./routes/storesRoutes'));
 app.use('/order', require('./routes/ordersRoutes'));
-app.use('/accounts', require('./routes/accountsRoutes'));
-app.use('/users', require('./routes/usersRoutes'));
+app.use('/accounts', require('./routes/users/accountsRoutes'));
+app.use('/users', require('./routes/users/usersRoutes'));
 app.use('/images', require('./routes/imagesRoutes'));
 app.use('/stats', require('./routes/StatsRoute'));
 app.use('/rating', require('./routes/ratingRoutes'));

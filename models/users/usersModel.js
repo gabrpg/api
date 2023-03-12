@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const cartModel = require('../models/cartsModel');
+const cartModel = require('./cartsModel');
 const ObjectId = mongoose.Schema.Types.ObjectId;
 
 const user = new mongoose.Schema(
@@ -16,7 +16,8 @@ const user = new mongoose.Schema(
         userAdmin: { type: Boolean, required: true, default: false },
         userCart: { type: [cartModel.schema], required: true, default: [] },
         userAllergenIds: [{ type: ObjectId, ref: 'MenuAllergenModel' , default: []}],
-        googleAuth : {type: String, required: false, default : ''}
+        googleAuth : {type: String, required: false, default : ''},
+            userToken : {type: String, required: false, default : ''}
     }
 );
 module.exports = mongoose.model('UsersModel', user);

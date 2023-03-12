@@ -1,4 +1,4 @@
-const StoresModel = require('../models/storesModel');
+const StoresModel = require('../models/stores/storesModel');
 const {ObjectId} = require("mongodb");
 
 async function getAllStores(req, res) {

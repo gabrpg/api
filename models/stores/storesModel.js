@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const MenuMealModel = require('./menu/menuMealModel')
+const MenuMealModel = require('../menu/menuMealModel')
 
 
 const storeBusinessHours = new mongoose.Schema(
