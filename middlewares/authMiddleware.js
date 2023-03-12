@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken');
-const Users = require('../models/users/usersModel');
-const {ObjectId} = require("mongodb");
+
 const isJwtValid = async (req, res, next) => {
     let token = req.cookies['SESSIONID'];
 
@@ -8,29 +7,13 @@ const isJwtValid = async (req, res, next) => {
         return res.sendStatus(401);
     }
 
-    try {
-        await Users.findOne({_id: new ObjectId(req.cookies['SESSION_INFO'].id)}).exec(async (err, data) => {
-            if(err || !data){
-                if(err){
-                    console.log(err);
-                }
-                return res.sendStatus(401);
-            }
-
-            if(data) {
-                jwt.verify(token, data.userToken, (err, payload) => {
-                    if(err) {
-                        return res.sendStatus(401);
-                    }
-                    req.payload = payload;
-                    next();
-                })
-            }
-        });
-    } catch(err) {
-        console.log(err);
-        return res.sendStatus(500);
-    }
+    jwt.verify(token, process.env.KEY, (err, payload) => {
+        if(err) {
+            return res.sendStatus(401);
+        }
+        req.payload = payload;
+        next();
+    });
 }
 
 const isAdmin = async (req, res, next) => {

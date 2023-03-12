@@ -296,7 +296,7 @@ async function login(req, res){
 
             if (data){
                 if(bcrypt.compareSync(req.body.userPassword, data.userPassword)){
-                    await setupPayload(req, res, data.userEmail, {id: data._id, isAdmin: data.userAdmin, isManager: data.userManager, isVerified: data.userEmailVerified , isGooglAuth: false});
+                    await setupPayload(req, res, {id: data._id, isAdmin: data.userAdmin, isManager: data.userManager, isVerified: data.userEmailVerified , isGooglAuth: false});
                     return res.sendStatus(201);
                 }
             }
@@ -307,10 +307,8 @@ async function login(req, res){
     }
 }
 
-async function setupPayload(req, res, user, payload) {
-    let token = generateToken();
-    await Users.findOneAndUpdate({userEmail: user}, {userToken: token})
-    let jwtToken = jwt.sign(payload, token, {expiresIn: '2h'});
+async function setupPayload(req, res, payload) {
+    let jwtToken = jwt.sign(payload, process.env.KEY , {expiresIn: '2h'});
     res.cookie("SESSIONID", jwtToken, {httpOnly: true});
     res.cookie("SESSION_INFO", payload);
 }
@@ -334,7 +332,7 @@ async function googleLogin(req, res){
             sameEmail[0].googleAuth = idToken;
             await sameEmail[0].save();
         }
-        await setupPayload(req, res, sameEmail[0].userEmail,{id: sameEmail[0]._id, isAdmin: sameEmail[0].userAdmin, isManager: sameEmail[0].userManager, isVerified: sameEmail[0].userEmailVerified, isGooglAuth: true});
+        await setupPayload(req, res, {id: sameEmail[0]._id, isAdmin: sameEmail[0].userAdmin, isManager: sameEmail[0].userManager, isVerified: sameEmail[0].userEmailVerified, isGooglAuth: true});
         return res.status(200).json({ message: sameEmail });
     }
     const user = new Users({
@@ -350,7 +348,7 @@ async function googleLogin(req, res){
     });
     user.save().then(async () => {
         const newUser = await Users.findOne({userEmail: email}).exec();
-        await setupPayload(req, res, newUser.userEmail,{id: newUser._id, isAdmin: newUser.userAdmin, isManager: newUser.userManager, isVerified: newUser.userEmailVerified, isGooglAuth: true});
+        await setupPayload(req, res, {id: newUser._id, isAdmin: newUser.userAdmin, isManager: newUser.userManager, isVerified: newUser.userEmailVerified, isGooglAuth: true});
         return res.status(200).json({message: user});
     })
         .catch(e => {
