@@ -130,7 +130,7 @@ async function verifyEmailToken(req, res) {
                 return res.sendStatus(401);
             }
             if(data) {
-                return res.sendStatus(200);
+                return res.sendStatus(204);
             }
         });
     } catch(err) {
@@ -143,7 +143,7 @@ async function verifyPasswordToken(req, res) {
     try {
         await clearCookies(req, res);
 
-        await Users.findOneAndUpdate({userPasswordToken: req.params.token}).exec((err, data) => {
+        await Users.findOne({userPasswordToken: req.params.token}).exec((err, data) => {
             if(err || !data){
                 if(err){
                     console.log(err);
@@ -162,7 +162,7 @@ async function verifyPasswordToken(req, res) {
 
 async function modifyPasswordAfterVerification(req, res){
     try {
-        await Users.findOne({userPasswordToken: req.body.userPasswordToken}).exec( async (err,data) => {
+        await Users.findOneAndUpdate({userPasswordToken: req.body.userPasswordToken}, {userPassword: bcrypt.hashSync(req.body.userPassword, 10), userPasswordToken: null}).exec( async (err,data) => {
             if(err || !data){
                 if(err){
                     console.log(err);
@@ -171,11 +171,7 @@ async function modifyPasswordAfterVerification(req, res){
             }
 
             if(data) {
-                data.userPasswordToken = null;
-                data.userPassword = bcrypt.hashSync(req.body.userPassword, 10);
-                await data.save().then(()=> {
-                    return res.sendStatus(200)
-                });
+                return res.sendStatus(204);
             }
         });
     }catch(err) {
