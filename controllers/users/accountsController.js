@@ -7,7 +7,7 @@ const bcrypt = require("bcrypt");
 
 
 async function getAllAddressesByID(req, res) {
-    await Address.find({userId: new ObjectId(req.cookies['SESSION_INFO'].id)}).select("-userPassword").exec((err, data) => {
+    await Address.find({userId: new ObjectId(req.cookies['SESSION_INFO'].id)}).select("-userPassword -googleAuth").exec((err, data) => {
         if(data && !err){
             return res.json(data);
         } else {
@@ -18,7 +18,7 @@ async function getAllAddressesByID(req, res) {
 }
 
 async function getAllInfosByID(req, res) {
-   await Users.findOne({_id: new ObjectId(req.cookies['SESSION_INFO'].id)}).select("-userPassword").exec((err, user) => {
+   await Users.findOne({_id: new ObjectId(req.cookies['SESSION_INFO'].id)}).select("-userPassword -googleAuth").exec((err, user) => {
         if (user && !err) {
             return res.json(user);
         }

@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
-require('dotenv').config();
+
 
 async function getOne(req, res) {
     try {
@@ -23,6 +23,7 @@ async function getOne(req, res) {
         return res.status(400).json({error: "error when getting item"});
     }
 }
+
 async function getAllManagers(req, res) {
     await Users.find().select("-userPassword")
         .then(managers => {
@@ -91,7 +92,7 @@ function generateToken() {
     return crypto.randomBytes(32).toString('hex');
 }
 
-function sendVerificationLink(message) {
+async function sendVerificationLink(message) {
 
     const transporter = nodemailer.createTransport({
         host:'smtp.gmail.com',
@@ -108,7 +109,7 @@ function sendVerificationLink(message) {
         },
     });
 
-    transporter.sendMail(message, function(err, info){
+    await transporter.sendMail(message, function(err, info){
         if (err) {
             console.log('Email error: ' + err);
         } else {
@@ -129,7 +130,7 @@ async function verifyEmailToken(req, res) {
                 return res.sendStatus(401);
             }
             if(data) {
-                return res.sendStatus(200);
+                return res.sendStatus(204);
             }
         });
     } catch(err) {
@@ -161,7 +162,7 @@ async function verifyPasswordToken(req, res) {
 
 async function modifyPasswordAfterVerification(req, res){
     try {
-        await Users.findOne({userPasswordToken: req.body.userPasswordToken}).exec( async (err, data) => {
+        await Users.findOneAndUpdate({userPasswordToken: req.body.userPasswordToken}, {userPassword: bcrypt.hashSync(req.body.userPassword, 10), userPasswordToken: null}).exec( async (err,data) => {
             if(err || !data){
                 if(err){
                     console.log(err);
@@ -169,25 +170,17 @@ async function modifyPasswordAfterVerification(req, res){
                 return res.sendStatus(401);
             }
 
-            if(data){
-                data.userPasswordToken = undefined;
-                data.userPassword = bcrypt.hashSync(req.body.userPassword, 10);
-                await data.save().then(() => {
-                    return res.sendStatus(201);
-                })
-                .catch(err => {
-                    console.log(err);
-                    return res.sendStatus(401);
-                });
+            if(data) {
+                return res.sendStatus(204);
             }
         });
-    } catch(err) {
+    }catch(err) {
         console.log(err);
         return res.sendStatus(500);
     }
 }
 
-async function newVerficationToken(req, res) {
+async function newVerficationTokenForEmail(req, res) {
     try {
         await Users.findOne({_id: new ObjectId(req.cookies['SESSION_INFO'].id)}).exec(async (err, data) => {
             if(err || !data){
@@ -220,7 +213,7 @@ async function newVerficationToken(req, res) {
     }
 }
 
-async function newPassword(req, res){
+async function newVerficationTokenForPassword(req, res){
     try {
         await Users.findOne({userEmail: req.body.userEmail}).exec(async (err, data)=> {
             if(err || !data){
@@ -304,7 +297,7 @@ async function login(req, res){
 
             if (data){
                 if(bcrypt.compareSync(req.body.userPassword, data.userPassword)){
-                    await setupPayload(req, res, data.userEmail, {id: data._id, isAdmin: data.userAdmin, isManager: data.userManager, isVerified: data.userEmailVerified , isGooglAuth: false});
+                    await setupPayload(req, res, {id: data._id, isAdmin: data.userAdmin, isManager: data.userManager, isVerified: data.userEmailVerified , isGooglAuth: false});
                     return res.sendStatus(201);
                 }
             }
@@ -315,10 +308,8 @@ async function login(req, res){
     }
 }
 
-async function setupPayload(req, res, user, payload) {
-    let token = generateToken();
-    await Users.findOneAndUpdate({userEmail: user}, {userToken: token})
-    let jwtToken = jwt.sign(payload, token, {expiresIn: '2h'});
+async function setupPayload(req, res, payload) {
+    let jwtToken = jwt.sign(payload, process.env.KEY , {expiresIn: '2h'});
     res.cookie("SESSIONID", jwtToken, {httpOnly: true});
     res.cookie("SESSION_INFO", payload);
 }
@@ -342,7 +333,7 @@ async function googleLogin(req, res){
             sameEmail[0].googleAuth = idToken;
             await sameEmail[0].save();
         }
-        await setupPayload(req, res, sameEmail[0].userEmail,{id: sameEmail[0]._id, isAdmin: sameEmail[0].userAdmin, isManager: sameEmail[0].userManager, isVerified: sameEmail[0].userEmailVerified, isGooglAuth: true});
+        await setupPayload(req, res, {id: sameEmail[0]._id, isAdmin: sameEmail[0].userAdmin, isManager: sameEmail[0].userManager, isVerified: sameEmail[0].userEmailVerified, isGooglAuth: true});
         return res.status(200).json({ message: sameEmail });
     }
     const user = new Users({
@@ -358,7 +349,7 @@ async function googleLogin(req, res){
     });
     user.save().then(async () => {
         const newUser = await Users.findOne({userEmail: email}).exec();
-        await setupPayload(req, res, newUser.userEmail,{id: newUser._id, isAdmin: newUser.userAdmin, isManager: newUser.userManager, isVerified: newUser.userEmailVerified, isGooglAuth: true});
+        await setupPayload(req, res, {id: newUser._id, isAdmin: newUser.userAdmin, isManager: newUser.userManager, isVerified: newUser.userEmailVerified, isGooglAuth: true});
         return res.status(200).json({message: user});
     })
         .catch(e => {
@@ -366,4 +357,4 @@ async function googleLogin(req, res){
         });
 }
 
-module.exports = { getOne, getAllManagers, register, login, logout, getCart, addToCart, emptyCart, replaceCart, verifyEmailToken, newVerficationToken, newPassword, verifyPasswordToken, modifyPasswordAfterVerification, googleLogin,  getAllCustomers};
+module.exports = { getOne, getAllManagers, register, login, logout, getCart, addToCart, emptyCart, replaceCart, verifyEmailToken, newVerficationTokenForEmail, newVerficationTokenForPassword, verifyPasswordToken, modifyPasswordAfterVerification, googleLogin,  getAllCustomers};
