@@ -230,6 +230,10 @@ async function newPassword(req, res){
                 return res.sendStatus(401);
             }
 
+            if(data.googleAuth !== ""){
+                return res.sendStatus(401);
+            }
+
             if(data){
                 data.userPasswordToken = generateToken();
                 await data.save().then(() => {
