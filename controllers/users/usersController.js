@@ -171,7 +171,7 @@ async function modifyPasswordAfterVerification(req, res){
             }
 
             if(data){
-                data.userPasswordToken = "";
+                data.userPasswordToken = null;
                 data.userPassword = bcrypt.hashSync(req.body.userPassword, 10);
                 await data.save().then(() => {
                     return res.sendStatus(201);
