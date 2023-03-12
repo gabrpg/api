@@ -162,18 +162,23 @@ async function verifyPasswordToken(req, res) {
 
 async function modifyPasswordAfterVerification(req, res){
     try {
-        await Users.findOneAndUpdate({userPasswordToken: req.body.userPasswordToken}, {userPassword: bcrypt.hashSync(req.body.userPassword, 10), userPasswordToken: null}).exec(async(err, data) => {
+        await Users.findOne({userPasswordToken: req.body.userPasswordToken}).exec( async (err,data) => {
             if(err || !data){
                 if(err){
                     console.log(err);
                 }
                 return res.sendStatus(401);
             }
+
             if(data) {
-                return res.sendStatus(200);
+                data.userPasswordToken = null;
+                data.userPassword = bcrypt.hashSync(req.body.userPassword, 10);
+                await data.save().then(()=> {
+                    return res.sendStatus(200)
+                });
             }
         });
-    } catch(err) {
+    }catch(err) {
         console.log(err);
         return res.sendStatus(500);
     }
