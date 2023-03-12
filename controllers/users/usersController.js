@@ -143,7 +143,7 @@ async function verifyPasswordToken(req, res) {
     try {
         await clearCookies(req, res);
 
-        await Users.findOneAndUpdate({userPasswordToken: req.params.token} , { userPasswordToken: null }).exec((err, data) => {
+        await Users.findOneAndUpdate({userPasswordToken: req.params.token}).exec((err, data) => {
             if(err || !data){
                 if(err){
                     console.log(err);
