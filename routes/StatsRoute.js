@@ -4,7 +4,7 @@ let statsController = require('../controllers/statisticController');
 const { isJwtValid, isManager, isAdmin } = require('../middlewares/authMiddleware');
 
 
-router.route('/sales')
+router.route('/sales/:days')
     .get(isJwtValid, isAdmin, statsController.getSalesStats);
 
 module.exports = router;

@@ -3,6 +3,10 @@ const MenuMeal = require("../models/menu/menuMealModel");
 const Stats = require("../models/statsModel");
 
 function getSalesStats(req, res){
+    let days = req.params.days;
+    let date = new Date();
+    date.setDate(date.getDate()-days);
+
     const sales = new Map()
     let salesArray = []
     MenuMeal.find()
@@ -16,11 +20,13 @@ function getSalesStats(req, res){
                 }
                 else {
                     orders.forEach(order =>{
-                        order.orderMeals.forEach(meal =>{
-                            let name = meal.cartMeal.menuMealName
-                            let price = meal.cartMeal.menuMealPrice
-                            sales.set(name, sales.get(name) + price)
-                        });
+                        if(order.orderDate.getTime() >= date.getTime()){
+                            order.orderMeals.forEach(meal =>{
+                                let name = meal.cartMeal.menuMealName
+                                let price = meal.cartMeal.menuMealPrice
+                                sales.set(name, sales.get(name) + price)
+                            });
+                        }
                     });
                 }
                 sales.forEach((values,keys)=>{
