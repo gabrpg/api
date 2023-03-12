@@ -5,7 +5,7 @@ const ObjectId = mongoose.Schema.Types.ObjectId;
 const cart = new mongoose.Schema(
     {
         cartMeal: { type: menuMealModel.schema, required: true },
-        cartStore: { type: ObjectId, ref: 'StoresModel' },
+        cartStore: { type: String, required: true },
         cartQty: { type: Number, required: true, min: 1, default: 1}
     }
 );

@@ -2,22 +2,30 @@ let express = require('express');
 let usersController = require('../controllers/usersController');
 let accountsController = require('../controllers/accountsController');
 let router = express.Router();
-const { isJwtValid, isManager, isAdmin, isVerified, checkUserIdentity } = require('../middlewares/authMiddleware');
+const { isJwtValid, isManager, isAdmin, isVerified } = require('../middlewares/authMiddleware');
 router.route('/')
-    .get(isJwtValid, isVerified, checkUserIdentity, accountsController.getAllInfosByID)
-    .put(isJwtValid, isVerified, checkUserIdentity, accountsController.modifyAccount)
-    .patch(isJwtValid, isVerified, checkUserIdentity, accountsController.modifyPassword)
+    .get(isJwtValid, isVerified, accountsController.getAllInfosByID)
+    .put(isJwtValid, isVerified, accountsController.modifyAccount)
+    .patch(isJwtValid, isVerified, accountsController.modifyPassword)
 router.route('/delete')
-    .post(isJwtValid, isVerified, checkUserIdentity, accountsController.deleteAccount)
+    .post(isJwtValid, isVerified, accountsController.deleteAccount)
+router.route('/payment-info')
+    .post(accountsController.addPaymentInfo);
+router.route('/payment-info/:id')
+    .get(accountsController.getPaymentInfo);
+router.route('/allergies/:id')
+    .post(accountsController.replaceAllergies);
 router.route('/addresses')
-    .get(isJwtValid, isVerified, checkUserIdentity, accountsController.getAllAddressesByID)
-    .post(isJwtValid, isVerified, checkUserIdentity, accountsController.addAddress)
-router.route('/addresses:id')
-    .delete(isJwtValid, isVerified, checkUserIdentity, accountsController.removeAddress)
+    .get(isJwtValid, isVerified, accountsController.getAllAddressesByID)
+    .post(isJwtValid, isVerified, accountsController.addAddress)
+router.route('/addresses/delete')
+    .post(isJwtValid, isVerified, accountsController.removeAddress)
 router.route('/cart')
     .post(isJwtValid, usersController.addToCart)
     .delete(isJwtValid, usersController.emptyCart)
     .put(isJwtValid, usersController.replaceCart);
 router.route('/cart/:id')
     .get(usersController.getCart)
+    .delete(usersController.emptyCart)
+    .post(usersController.replaceCart);
 module.exports = router;

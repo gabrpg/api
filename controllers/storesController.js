@@ -19,12 +19,24 @@ async function getOne(req, res) {
     }
 }
 
+async function getManagerStores(req, res) {
+    StoresModel.find({storeManagerId: new ObjectId(req.payload.id)}).exec((err, stores) => {
+        if (err) {
+            console.log(err);
+            return res.status(400);
+        }
+        else {
+            return res.json(stores);
+        }
+    })
+}
+
 async function createStore(req, res) {
     let hours = req.body.storeBusinessHours;
     let manager = req.body.storeManagerId;
 
     if(manager) {
-         manager = new ObjectId(manager[0]);
+         manager = new ObjectId(manager);
     } else {
         manager = null;
     }
@@ -62,7 +74,7 @@ async function updateStore(req, res) {
     let manager = req.body.storeManagerId;
 
     if(manager) {
-        manager = new ObjectId(manager[0]);
+        manager = new ObjectId(manager);
     } else {
         manager = null;
     }
@@ -115,4 +127,4 @@ async function deleteAllStores(req, res) {
     }
 }
 
-module.exports = { getAllStores, getOne, updateStore, createStore, deleteStore, deleteAllStores };
+module.exports = { getAllStores, getOne, getManagerStores, updateStore, createStore, deleteStore, deleteAllStores };

@@ -20,6 +20,7 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 3000;
 
 mongoose.set('strictQuery', false);
+
 mongoose.connect(process.env.DB_CONNECT).then(()=> console.log('Connected to DB'),  { useNewUrlParser: true, useUnifiedTopology: true });
 
 app.use('/menu', require("./routes/menuRoutes"));
@@ -30,6 +31,7 @@ app.use('/users', require('./routes/usersRoutes'));
 app.use('/images', require('./routes/imagesRoutes'));
 app.use('/stats', require('./routes/StatsRoute'));
 app.use('/rating', require('./routes/ratingRoutes'));
+app.use('/mobile', require('./routes/mobileRoutes'));
 app.use('/images', express.static('./images'));
 
 
